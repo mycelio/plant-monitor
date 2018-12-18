@@ -1,55 +1,66 @@
 #include <CapacitiveSensor.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#define DHTTYPE DHT11
+
 
 // configure sensor pins
-const int photosensor = A0;
-const int moisturesensor = A1;
-CapacitiveSensor capsensor = CapacitiveSensor(2, 4); // 1M resistor between pins 2 and 4
+const int lightSensor = A0;
+const int moistureSensor = A1;
+CapacitiveSensor touchSensor = CapacitiveSensor(2, 4);
+DHT dht(8, DHTTYPE);
 
 
 
 // values that will change throughout the loop
-int photosensorValue = 0;
-int capsensorValue = 0;
-int moisturesensorValue = 0;
+int lightValue = 0;
+int touchValue = 0;
+int moistureValue = 0;
+int humidityValue = 0;
+int temperatureValue = 0;
 
 
 // initial setup
 void setup() {
-  pinMode(photosensor, INPUT);
-  pinMode(moisturesensor, INPUT);
+  pinMode(lightSensor, INPUT);
+  pinMode(moistureSensor, INPUT);
+  dht.begin();
   Serial.begin(9600);
 }
 
 void loop() {
 
-  // read photsensor value
-  photosensorValue = analogRead(photosensor);
+  // read sensor values
+  lightValue = analogRead(lightSensor);
+  touchValue = touchSensor.capacitiveSensor(30);
+  moistureValue = analogRead(moistureSensor);
+  humidityValue = dht.readHumidity();
+  temperatureValue = dht.readTemperature();
+
+  //  print values to Serial
+  Serial.print("moisture: ");
+  Serial.print(moistureValue);
+  Serial.print("\t"); // spacing
   
-  // print photosensor value to Serial
-  Serial.print("photosensor = ");
-  Serial.print(photosensorValue);
-  Serial.println("");
-
-
-
-  // read capacitor value
-  capsensorValue = capsensor.capacitiveSensor(30);
-
-  // print capacitor value to Serial
-  Serial.print("capsensor = ");
-  Serial.print(capsensorValue);
-  Serial.println("");
-
-
-
-  // read moisture sensor value
-  moisturesensorValue = analogRead(moisturesensor);
-
-  // print moisture values to Serial
-  Serial.print("moisture = ");
-  Serial.print(moisturesensorValue);
-  Serial.println("");
+  Serial.print("temperature: ");
+  Serial.print(temperatureValue);
+  Serial.print("\t"); // spacing
   
-  delay(500);
+  Serial.print("humidity: ");
+  Serial.print(humidityValue);
+  Serial.print("\t"); // spacing
+
+  Serial.print("light: ");
+  Serial.print(lightValue);
+  Serial.print("\t"); // spacing
+  
+  Serial.print("touch: ");
+  Serial.print(touchValue);
+  Serial.print("\t"); // spacing
+  
+  Serial.print("\n"); // new line
+
+  // delay of 1s
+  delay(1000);
 
 }
